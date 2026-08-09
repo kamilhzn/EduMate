@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.4.5</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>com.edumate</groupId>
+    <artifactId>edumate</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>EduMate</name>
+    <description>基于 RAG 与知识图谱的课程学习智能助手</description>
+
+    <modules>
+        <module>edumate-common</module>
+        <module>edumate-core</module>
+        <module>edumate-admin</module>
+    </modules>
+
+    <properties>
+        <java.version>21</java.version>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <langchain4j.version>1.17.2</langchain4j.version>
+        <langchain4j.community.version>1.17.2-beta27</langchain4j.community.version>
+        <pdfbox.version>3.0.4</pdfbox.version>
+        <poi.version>5.4.0</poi.version>
+        <docling.version>2.7.0</docling.version>
+        <neo4j.driver.version>5.28.0</neo4j.driver.version>
+        <lombok.version>1.18.36</lombok.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- 子模块内部依赖 -->
+            <dependency>
+                <groupId>com.edumate</groupId>
+                <artifactId>edumate-common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.edumate</groupId>
+                <artifactId>edumate-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- LangChain4j 核心 -->
+            <dependency>
+                <groupId>dev.langchain4j</groupId>
+                <artifactId>langchain4j-core</artifactId>
+                <version>${langchain4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>dev.langchain4j</groupId>
+                <artifactId>langchain4j-spring-boot-starter</artifactId>
+                <version>${langchain4j.community.version}</version>
+            </dependency>
+
+            <!-- LangChain4j Community: DashScope（通义千问） -->
+            <dependency>
+                <groupId>dev.langchain4j</groupId>
+                <artifactId>langchain4j-community-dashscope-spring-boot-starter</artifactId>
+                <version>${langchain4j.community.version}</version>
+            </dependency>
+
+            <!-- LangChain4j Qdrant 向量存储（非 community，无 Starter，需手动配置 Bean） -->
+            <dependency>
+                <groupId>dev.langchain4j</groupId>
+                <artifactId>langchain4j-qdrant</artifactId>
+                <version>${langchain4j.community.version}</version>
+            </dependency>
+
+            <!-- PDF 解析 -->
+            <dependency>
+                <groupId>org.apache.pdfbox</groupId>
+                <artifactId>pdfbox</artifactId>
+                <version>${pdfbox.version}</version>
+            </dependency>
+
+            <!-- PPT/Word 解析 -->
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi-ooxml</artifactId>
+                <version>${poi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi-scratchpad</artifactId>
+                <version>${poi.version}</version>
+            </dependency>
+
+            <!-- IBM Docling -->
+            <dependency>
+                <groupId>com.ibm.docling</groupId>
+                <artifactId>docling-core</artifactId>
+                <version>${docling.version}</version>
+            </dependency>
+
+            <!-- Neo4j Java Driver（原生驱动，非 Spring Data） -->
+            <dependency>
+                <groupId>org.neo4j.driver</groupId>
+                <artifactId>neo4j-java-driver</artifactId>
+                <version>${neo4j.driver.version}</version>
+            </dependency>
+
+            <!-- Lombok -->
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.13.0</version>
+                <configuration>
+                    <release>21</release>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <repositories>
+        <repository>
+            <id>aliyun</id>
+            <url>https://maven.aliyun.com/repository/public</url>
+        </repository>
+        <repository>
+            <id>central</id>
+            <url>https://repo.maven.apache.org/maven2</url>
+        </repository>
+        <repository>
+            <id>spring-milestones</id>
+            <name>Spring Milestones</name>
+            <url>https://repo.spring.io/milestone</url>
+        </repository>
+    </repositories>
+</project>

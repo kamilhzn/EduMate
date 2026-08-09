@@ -1,0 +1,10 @@
+com\edumate\common\model\DocumentChunk$DocumentChunkBuilder.class
+com\edumate\common\model\QuizQuestion$QuizQuestionBuilder.class
+com\edumate\common\model\CourseMetadata$CourseMetadataBuilder.class
+com\edumate\common\model\DocumentChunk.class
+com\edumate\common\enums\KnowledgeRelationType.class
+com\edumate\common\model\CourseMetadata.class
+com\edumate\common\enums\DocumentType.class
+com\edumate\common\model\QuizQuestion.class
+com\edumate\common\model\ChatMessage$ChatMessageBuilder.class
+com\edumate\common\model\ChatMessage.class

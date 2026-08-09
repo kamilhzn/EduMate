@@ -1,0 +1,84 @@
+package com.edumate.core.retrieval;
+
+import com.edumate.common.model.DocumentChunk;
+import dev.langchain4j.data.embedding.Embedding;
+import dev.langchain4j.data.segment.TextSegment;
+import dev.langchain4j.model.embedding.EmbeddingModel;
+import dev.langchain4j.model.output.Response;
+import dev.langchain4j.store.embedding.EmbeddingMatch;
+import dev.langchain4j.store.embedding.EmbeddingSearchRequest;
+import dev.langchain4j.store.embedding.EmbeddingSearchResult;
+import dev.langchain4j.store.embedding.EmbeddingStore;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
+class VectorStoreServiceTest {
+
+    @Mock
+    private EmbeddingStore<TextSegment> embeddingStore;
+
+    @Mock
+    private EmbeddingModel embeddingModel;
+
+    private VectorStoreService vectorStoreService;
+
+    @BeforeEach
+    void setUp() {
+        vectorStoreService = new VectorStoreService(embeddingStore, embeddingModel);
+    }
+
+    @Test
+    void shouldEmbedAndStoreChunks() {
+        when(embeddingModel.embedAll(anyList()))
+                .thenReturn(Response.from(List.of(new Embedding(List.of(0.1f, 0.2f)))));
+
+        List<DocumentChunk> chunks = List.of(
+                DocumentChunk.builder()
+                        .id("chunk-1")
+                        .content("红黑树是一种自平衡二叉搜索树")
+                        .courseName("数据结构")
+                        .chapterPath("第3章 > 3.2节 > 红黑树")
+                        .build()
+        );
+
+        vectorStoreService.indexChunks(chunks);
+
+        verify(embeddingModel).embedAll(anyList());
+        verify(embeddingStore).addAll(anyList(), anyList());
+    }
+
+    @Test
+    void shouldSearchByQuery() {
+        String query = "什么是红黑树";
+        when(embeddingModel.embed(eq(query)))
+                .thenReturn(Response.from(new Embedding(List.of(0.1f, 0.2f))));
+        when(embeddingStore.search(any(EmbeddingSearchRequest.class)))
+                .thenReturn(new EmbeddingSearchResult<>(List.of()));
+
+        List<DocumentChunk> results = vectorStoreService.search(query, 5);
+
+        verify(embeddingModel).embed(query);
+        verify(embeddingStore).search(any(EmbeddingSearchRequest.class));
+        assertThat(results).isEmpty();
+    }
+
+    @Test
+    void shouldHandleEmptyChunks() {
+        vectorStoreService.indexChunks(List.of());
+        verify(embeddingModel, never()).embedAll(anyList());
+        verify(embeddingStore, never()).addAll(anyList(), anyList());
+    }
+}

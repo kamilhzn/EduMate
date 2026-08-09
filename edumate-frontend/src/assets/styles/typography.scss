@@ -1,0 +1,25 @@
+.page-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-text, #1F2937);
+  margin-bottom: 24px;
+  letter-spacing: -0.02em;
+}
+
+.page-subtitle {
+  color: var(--color-text-secondary, #6B7280);
+  font-size: 15px;
+  margin: -16px 0 32px;
+}
+
+.text-secondary {
+  color: var(--color-text-secondary, #6B7280);
+}
+
+.text-sm {
+  font-size: 13px;
+}
+
+.text-xs {
+  font-size: 12px;
+}

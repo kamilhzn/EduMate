@@ -1,0 +1,69 @@
+package com.edumate.core.graph;
+
+import com.edumate.common.model.DocumentChunk;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.neo4j.driver.*;
+import org.neo4j.driver.Record;
+
+import java.util.List;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.Mockito.*;
+
+@SuppressWarnings("resource")
+class GraphSearchServiceTest {
+
+    private Driver driver;
+    private Session session;
+    private GraphSearchService graphSearchService;
+
+    @BeforeEach
+    void setUp() {
+        driver = mock(Driver.class);
+        session = mock(Session.class);
+        when(driver.session(any(SessionConfig.class))).thenReturn(session);
+        graphSearchService = new GraphSearchService(driver);
+    }
+
+    @Test
+    void shouldReturnEmptyListWhenDriverIsNull() {
+        GraphSearchService service = new GraphSearchService(null);
+        List<DocumentChunk> results = service.search("红黑树", 5);
+        assertThat(results).isEmpty();
+    }
+
+    @Test
+    void shouldSearchByNameMatch() {
+        Result result = mock(Result.class);
+        Record record = mock(Record.class);
+        Value value = mock(Value.class);
+
+        when(session.run(anyString(), anyMap())).thenReturn(result);
+        when(result.list()).thenReturn(List.of(record));
+        when(record.get("name")).thenReturn(value);
+        when(record.get("description")).thenReturn(value);
+        when(record.get("courseName")).thenReturn(value);
+        when(record.get("chapterPath")).thenReturn(value);
+        when(record.get("sourceChunkId")).thenReturn(value);
+        when(record.get("content")).thenReturn(value);
+
+        when(value.asString())
+                .thenReturn("红黑树")
+                .thenReturn("一种自平衡二叉搜索树")
+                .thenReturn("数据结构")
+                .thenReturn("第3章 > 3.2节 > 红黑树")
+                .thenReturn("chunk-1")
+                .thenReturn("红黑树是一种自平衡二叉搜索树");
+
+        List<DocumentChunk> results = graphSearchService.search("红黑树", 5);
+
+        assertThat(results).hasSize(1);
+        assertThat(results.get(0).getId()).isEqualTo("chunk-1");
+        assertThat(results.get(0).getCourseName()).isEqualTo("数据结构");
+    }
+}

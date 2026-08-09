@@ -1,0 +1,45 @@
+:root {
+  /* Layout */
+  --sidebar-width: 240px;
+  --sidebar-collapsed: 60px;
+
+  /* Colors */
+  --color-bg: #F5F7FA;
+  --color-surface: #FFFFFF;
+  --color-border: #E5E7EB;
+
+  /* Text */
+  --color-text: #1F2937;
+  --color-text-secondary: #6B7280;
+
+  /* Primary (Blue) */
+  --color-primary: #1A56DB;
+  --color-primary-light: rgba(26, 86, 219, 0.08);
+
+  /* Accent (Gold) */
+  --color-accent: #E8A817;
+  --color-accent-light: rgba(232, 168, 23, 0.12);
+  --color-accent-dark: #B8860B;
+
+  /* Success (Green) */
+  --color-success: #2DA44E;
+  --color-success-light: rgba(45, 164, 78, 0.08);
+
+  /* Danger (Red) */
+  --color-danger: #DC2626;
+  --color-danger-light: rgba(220, 38, 38, 0.08);
+
+  /* Border Radius */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+
+  /* Shadows */
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0, 0, 0, 0.06);
+
+  /* Transitions */
+  --transition-normal: 0.25s ease;
+  --transition-bounce: 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}

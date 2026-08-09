@@ -1,0 +1,53 @@
+spring:
+  application:
+    name: EduMate
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+
+server:
+  port: 8080
+
+logging:
+  level:
+    com.edumate: DEBUG
+    org.apache.fontbox: ERROR
+    org.apache.pdfbox.pdmodel.font.FileSystemFontProvider: ERROR
+
+# LangChain4j DashScope 通义千问（阿里云百炼，官方推荐）
+langchain4j:
+  community:
+    dashscope:
+      chat-model:
+        api-key: ${DASHSCOPE_API_KEY:}
+        model-name: ${DASHSCOPE_CHAT_MODEL:qwen-plus}
+        temperature: 0.7
+        max-tokens: 4096
+      embedding-model:
+        api-key: ${DASHSCOPE_API_KEY:}
+        model-name: ${DASHSCOPE_EMBEDDING_MODEL:text-embedding-v3}
+
+# Qdrant 向量数据库（手动配置，见 QdrantConfig）
+qdrant:
+  host: ${QDRANT_HOST:localhost}
+  grpc-port: ${QDRANT_GRPC_PORT:6334}
+  collection-name: edumate-docs
+
+# Elasticsearch 关键词检索
+elasticsearch:
+  host: ${ES_HOST:localhost}
+  port: ${ES_PORT:9200}
+  index-name: edumate-keywords
+
+# Neo4j 图数据库（知识图谱）
+neo4j:
+  uri: ${NEO4J_URI:bolt://localhost:7687}
+  username: ${NEO4J_USERNAME:neo4j}
+  password: ${NEO4J_PASSWORD:password123}
+  database: ${NEO4J_DATABASE:neo4j}
+
+# Redis 会话/缓存
+redis:
+  host: ${REDIS_HOST:127.0.0.1}
+  port: ${REDIS_PORT:6379}

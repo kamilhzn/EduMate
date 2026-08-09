@@ -1,0 +1,81 @@
+package com.edumate.core.retrieval;
+
+import com.edumate.common.model.DocumentChunk;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+class RRFusionServiceTest {
+
+    private RRFusionService fusionService;
+
+    @BeforeEach
+    void setUp() {
+        fusionService = new RRFusionService();
+    }
+
+    @Test
+    void shouldMergeAndRankResults() {
+        DocumentChunk chunkA = DocumentChunk.builder().id("A").content("红黑树定义").courseName("数据结构").build();
+        DocumentChunk chunkB = DocumentChunk.builder().id("B").content("二叉搜索树").courseName("数据结构").build();
+        DocumentChunk chunkC = DocumentChunk.builder().id("C").content("AVL树").courseName("数据结构").build();
+
+        // 向量检索结果：A 排第1，B 排第2
+        List<DocumentChunk> vectorResults = List.of(chunkA, chunkB);
+        // 关键词检索结果：B 排第1，C 排第2
+        List<DocumentChunk> keywordResults = List.of(chunkB, chunkC);
+
+        List<DocumentChunk> fused = fusionService.fuse(vectorResults, keywordResults, 5);
+
+        assertThat(fused).isNotEmpty();
+        // B 在两个结果中都出现，得分最高，应排第一
+        assertThat(fused.get(0).getId()).isEqualTo("B");
+        // 去重后应有 3 个唯一结果
+        assertThat(fused).hasSize(3);
+    }
+
+    @Test
+    void shouldHandleEmptyInputs() {
+        List<DocumentChunk> empty = List.of();
+        List<DocumentChunk> result = fusionService.fuse(empty, empty, 5);
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void shouldLimitToTopK() {
+        DocumentChunk chunk1 = DocumentChunk.builder().id("1").content("a").courseName("c").build();
+        DocumentChunk chunk2 = DocumentChunk.builder().id("2").content("b").courseName("c").build();
+        DocumentChunk chunk3 = DocumentChunk.builder().id("3").content("c").courseName("c").build();
+
+        List<DocumentChunk> result = fusionService.fuse(List.of(chunk1, chunk2, chunk3), List.of(), 2);
+        assertThat(result).hasSize(2);
+    }
+
+    @Test
+    void shouldFuseThreeResultSets() {
+        DocumentChunk chunkA = DocumentChunk.builder().id("A").content("红黑树定义").courseName("数据结构").build();
+        DocumentChunk chunkB = DocumentChunk.builder().id("B").content("二叉搜索树").courseName("数据结构").build();
+        DocumentChunk chunkC = DocumentChunk.builder().id("C").content("AVL树").courseName("数据结构").build();
+        DocumentChunk chunkD = DocumentChunk.builder().id("D").content("B树").courseName("数据结构").build();
+
+        // 向量：A(1), B(2), C(3)
+        List<DocumentChunk> vectorResults = List.of(chunkA, chunkB, chunkC);
+        // 关键词：B(1), C(2)
+        List<DocumentChunk> keywordResults = List.of(chunkB, chunkC);
+        // 图谱：C(1), D(2)
+        List<DocumentChunk> graphResults = List.of(chunkC, chunkD);
+
+        List<DocumentChunk> fused = fusionService.fuse(vectorResults, keywordResults, graphResults, 5);
+
+        assertThat(fused).isNotEmpty();
+        // C 在三路结果中都出现，得分最高
+        assertThat(fused.get(0).getId()).isEqualTo("C");
+        // B 在两路结果中出现，得分第二
+        assertThat(fused.get(1).getId()).isEqualTo("B");
+        // 去重后应有 4 个唯一结果
+        assertThat(fused).hasSize(4);
+    }
+}

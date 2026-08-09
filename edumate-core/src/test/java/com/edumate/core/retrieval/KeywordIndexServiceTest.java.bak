@@ -1,0 +1,53 @@
+package com.edumate.core.retrieval;
+
+import com.edumate.common.model.DocumentChunk;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.util.List;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+class KeywordIndexServiceTest {
+
+    private KeywordIndexService keywordIndexService;
+
+    @BeforeEach
+    void setUp() {
+        // 不连接真实 ES，仅验证数据转换逻辑
+        keywordIndexService = new KeywordIndexService(null);
+    }
+
+    @Test
+    void shouldBuildIndexDocumentFromChunk() {
+        DocumentChunk chunk = DocumentChunk.builder()
+                .id("chunk-1")
+                .content("红黑树是一种自平衡二叉搜索树")
+                .courseName("数据结构")
+                .chapterPath("第3章 > 3.2节 > 红黑树")
+                .build();
+
+        Map<String, Object> doc = keywordIndexService.buildDocument(chunk);
+
+        assertThat(doc).containsKeys("chunk_id", "content", "course_name", "chapter_path");
+        assertThat(doc.get("chunk_id")).isEqualTo("chunk-1");
+        assertThat(doc.get("content")).isEqualTo("红黑树是一种自平衡二叉搜索树");
+        assertThat(doc.get("course_name")).isEqualTo("数据结构");
+    }
+
+    @Test
+    void shouldIndexChunksGracefullyWhenEsNotAvailable() {
+        // 传入 null ES 客户端，indexChunks 应静默跳过
+        keywordIndexService.indexChunks(List.of(
+                DocumentChunk.builder().id("c1").content("test").courseName("c").build()
+        ));
+        // 不应抛出异常
+    }
+
+    @Test
+    void shouldSearchReturnEmptyWhenEsNotAvailable() {
+        List<DocumentChunk> results = keywordIndexService.search("test", 5);
+        assertThat(results).isEmpty();
+    }
+}

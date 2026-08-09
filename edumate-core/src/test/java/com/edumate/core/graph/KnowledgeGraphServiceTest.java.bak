@@ -1,0 +1,71 @@
+package com.edumate.core.graph;
+
+import com.edumate.common.model.KnowledgePoint;
+import com.edumate.common.model.KnowledgeRelation;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.neo4j.driver.*;
+
+import java.util.List;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.Mockito.*;
+
+@SuppressWarnings("resource")
+class KnowledgeGraphServiceTest {
+
+    private Driver driver;
+    private Session session;
+    private Transaction tx;
+    private KnowledgeGraphService graphService;
+
+    @BeforeEach
+    void setUp() {
+        driver = mock(Driver.class);
+        session = mock(Session.class);
+        tx = mock(Transaction.class);
+        when(driver.session(any(SessionConfig.class))).thenReturn(session);
+        when(session.beginTransaction()).thenReturn(tx);
+        graphService = new KnowledgeGraphService(driver);
+    }
+
+    @Test
+    void shouldSaveKnowledgePoints() {
+        when(tx.run(anyString(), anyMap())).thenReturn(mock(Result.class));
+
+        List<KnowledgePoint> points = List.of(
+                KnowledgePoint.builder()
+                        .name("红黑树")
+                        .description("一种自平衡二叉搜索树")
+                        .courseName("数据结构")
+                        .chapterPath("第3章 > 3.2节 > 红黑树")
+                        .sourceChunkId("chunk-1")
+                        .relations(List.of(
+                                KnowledgeRelation.builder()
+                                        .type(com.edumate.common.enums.KnowledgeRelationType.PREREQUISITE)
+                                        .targetName("二叉搜索树")
+                                        .description("红黑树是二叉搜索树的扩展")
+                                        .build()
+                        ))
+                        .build()
+        );
+
+        graphService.savePoints(points);
+
+        verify(tx, atLeastOnce()).run(anyString(), anyMap());
+        verify(tx).commit();
+        verify(session).close();
+    }
+
+    @Test
+    void shouldHandleEmptyPoints() {
+        graphService.savePoints(List.of());
+
+        verify(tx, never()).run(anyString(), anyMap());
+        verify(session).close();
+    }
+}

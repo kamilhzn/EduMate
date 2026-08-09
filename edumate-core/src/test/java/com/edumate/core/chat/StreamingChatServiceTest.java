@@ -1,0 +1,51 @@
+package com.edumate.core.chat;
+
+import com.edumate.core.agent.IntentClassifierService;
+import com.edumate.core.agent.QueryRewriteService;
+import com.edumate.core.agent.RefusalGuardService;
+import com.edumate.core.evaluation.TraceService;
+import com.edumate.core.retrieval.HybridSearchService;
+import dev.langchain4j.model.chat.ChatModel;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+@ExtendWith(MockitoExtension.class)
+class StreamingChatServiceTest {
+
+    @Mock
+    private ChatModel chatModel;
+
+    @Mock
+    private HybridSearchService hybridSearchService;
+
+    @Mock
+    private QueryRewriteService queryRewriteService;
+
+    @Mock
+    private IntentClassifierService intentClassifierService;
+
+    @Mock
+    private RefusalGuardService refusalGuardService;
+
+    @Mock
+    private ChatSessionService chatSessionService;
+
+    @Mock
+    private TraceService traceService;
+
+    @Test
+    void shouldBuildContextFromRetrievalResults() {
+        StreamingChatService service = new StreamingChatService(
+                chatModel, hybridSearchService, queryRewriteService,
+                intentClassifierService, refusalGuardService, chatSessionService,
+                traceService);
+
+        String context = service.buildContext("测试", "session-1");
+        assertNotNull(context);
+        assertTrue(context.contains("测试"));
+    }
+}

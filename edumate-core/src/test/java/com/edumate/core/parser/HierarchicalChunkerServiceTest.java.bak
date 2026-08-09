@@ -1,0 +1,68 @@
+package com.edumate.core.parser;
+
+import com.edumate.common.model.DocumentChunk;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+class HierarchicalChunkerServiceTest {
+
+    private HierarchicalChunkerService chunkerService;
+
+    @BeforeEach
+    void setUp() {
+        chunkerService = new HierarchicalChunkerService();
+    }
+
+    @Test
+    void shouldChunkByChapterHeadings() {
+        String content = """
+                第1章 数据结构基础
+                1.1 什么是数据结构
+                数据结构是计算机存储、组织数据的方式。
+                1.2 算法复杂度分析
+                算法复杂度分为时间复杂度和空间复杂度。
+                第2章 树与二叉树
+                2.1 树的基本概念
+                树是一种非线性数据结构。
+                """;
+
+        List<DocumentChunk> chunks = chunkerService.chunk(content, "数据结构", "2026-春");
+
+        assertThat(chunks).isNotEmpty();
+        // 应该至少按章节切分出 2 个大块
+        assertThat(chunks.size()).isGreaterThanOrEqualTo(2);
+        // 每个块应有章节路径
+        assertThat(chunks).allMatch(chunk -> chunk.getChapterPath() != null);
+        // 每个块应关联课程名
+        assertThat(chunks).allMatch(chunk -> "数据结构".equals(chunk.getCourseName()));
+    }
+
+    @Test
+    void shouldHandleEmptyContent() {
+        List<DocumentChunk> chunks = chunkerService.chunk("", "测试课程", "2026-春");
+
+        assertThat(chunks).isEmpty();
+    }
+
+    @Test
+    void shouldPreserveChapterHierarchy() {
+        String content = """
+                第1章 概述
+                1.1 背景
+                这是背景内容。
+                1.2 目标
+                这是目标内容。
+                """;
+
+        List<DocumentChunk> chunks = chunkerService.chunk(content, "测试课程", "2026-春");
+
+        // 子节的 chapterPath 应包含父章节
+        boolean hasSubSection = chunks.stream()
+                .anyMatch(c -> c.getChapterPath().contains("1.1"));
+        assertThat(hasSubSection).isTrue();
+    }
+}
