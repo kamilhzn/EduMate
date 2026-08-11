@@ -217,22 +217,7 @@ EvaluationOrchestrator.runRetrievalEvaluation()
   → 返回 EvaluationResult（含逐样本明细）
 ```
 
----
-
-## 六、开发阶段
-
-| Phase | 状态 | 内容 |
-|-------|------|------|
-| **Phase 1** | ✅ 已完成 | 多模块架构、数据模型、文档解析、层级切分、LangChain4j 集成、Docker Compose |
-| **Phase 2** | ✅ 已完成 | Qdrant 向量化、ES 关键词索引、混合检索 Pipeline、RRF 融合 |
-| **Phase 3** | ✅ 已完成 | Neo4j Schema、LLM 知识抽取、图谱检索集成 |
-| **Phase 4** | ✅ 已完成 | 智能出题 Agent、意图识别、Query 改写、拒答守卫、多轮对话、SSE 流式 |
-| **Phase 5** | ✅ 已完成 | 50 条评测数据集、Recall@K/MRR/NDCG、RAGAS 评测、全链路 Trace 追踪 |
-| **Phase 6** | ⏳ 待开发 | Vue 3 前端、Docker 一键部署 |
-
----
-
-## 七、设计亮点
+## 六、设计亮点
 
 ### 1. 降级设计
 
@@ -275,7 +260,7 @@ RAGAS 评测使用 LLM 作为评判者，评估三个维度：
 
 ---
 
-## 八、快速开始
+## 七、快速开始
 
 ### 前置条件
 
@@ -286,7 +271,7 @@ RAGAS 评测使用 LLM 作为评判者，评估三个维度：
 ### 1. 克隆项目
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/kamilhzn/EduMate.git
 cd EduMate
 ```
 
@@ -306,7 +291,7 @@ docker compose up -d
 ### 4. 编译运行
 
 ```bash
-# 编译（使用 Maven Wrapper，无需安装 Maven）
+# 编译（使用 Maven Wrapper）
 mvnw.cmd clean install -DskipTests
 
 # 运行测试
@@ -315,6 +300,7 @@ mvnw.cmd test
 # 启动应用
 mvnw.cmd -pl edumate-admin spring-boot:run
 ```
+或在IDEA中运行
 
 ### 5. 测试 API
 
@@ -345,27 +331,3 @@ curl -X POST http://localhost:8080/api/eval/retrieval \
   -H "Content-Type: application/json" \
   -d '{}'
 ```
-
----
-
-## 九、开发路线
-
-```
-Phase 1 ✅          Phase 2 ✅          Phase 3 ✅          Phase 4 ✅          Phase 5 ✅          Phase 6 ⏳
-基础骨架           检索能力           知识图谱           Agent能力          评测体系           前端与部署
-──────┼───────────────┼──────────────────┼───────────────────┼───────────────────┼───────────────────┼──────►
-多模块架构         向量化+Qdrant      Neo4j Schema       Agent 出题          评测数据集          Vue 3 前端
-文档解析           ES 关键词索引      LLM 知识抽取       意图识别             Recall@K/MRR        Docker 部署
-层级切分           混合检索Pipeline   图谱检索集成        Query 改写           RAGAS 评测
-LangChain4j        RRF 融合                            拒答守卫             Trace 追踪
-Docker Compose                                        多轮对话+SSE
-```
-
----
-
-## 十、参考项目
-
-- [RuoYi-RAG](https://github.com/zhaoshibao/ruoyi-rag) — Spring AI 框架的 RAG 知识库系统
-- [LangChain4j](https://docs.langchain4j.dev/) — Java 生态的 LLM 应用开发框架
-- [Qdrant](https://qdrant.tech/) — 高性能向量数据库
-- [RAGAS](https://docs.ragas.io/) — RAG 系统评测框架
