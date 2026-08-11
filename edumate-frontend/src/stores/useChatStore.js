@@ -18,6 +18,7 @@ export const useChatStore = defineStore('chat', () => {
         messages: [{
           role: 'assistant',
           content: '你好！我是 EduMate 学习助手，请随时向我提问课程相关问题。',
+          references: null,
           timestamp: Date.now()
         }],
         sessionId: null
@@ -32,16 +33,38 @@ export const useChatStore = defineStore('chat', () => {
     const session = sessions.value[currentCourseId.value]
     if (!session) return
 
-    session.messages.push({ role: 'user', content: content.trim(), timestamp: Date.now() })
+    session.messages.push({ role: 'user', content: content.trim(), references: null, timestamp: Date.now() })
 
-    const aiMsg = { role: 'assistant', content: '', timestamp: Date.now() }
+    const aiMsg = { role: 'assistant', content: '', references: null, timestamp: Date.now() }
     session.messages.push(aiMsg)
 
     isStreaming.value = true
 
     try {
-      for await (const chunk of streamChat(content.trim(), session.sessionId)) {
-        aiMsg.content += chunk
+      for await (const { event, data } of streamChat(content.trim(), session.sessionId)) {
+        if (event === 'message') {
+          aiMsg.content += data
+        } else if (event === 'references') {
+          try {
+            const refs = JSON.parse(data)
+            if (Array.isArray(refs) && refs.length > 0) {
+              aiMsg.references = refs
+            }
+          } catch (e) {
+            console.error('解析参考资料失败:', e)
+          }
+        } else if (event === 'done') {
+          try {
+            const doneData = JSON.parse(data)
+            if (doneData.sessionId) {
+              session.sessionId = doneData.sessionId
+            }
+          } catch (e) {
+            console.error('解析完成事件失败:', e)
+          }
+        } else if (event === 'error') {
+          aiMsg.content = data
+        }
       }
     } catch {
       if (aiMsg.content === '') {
@@ -59,6 +82,7 @@ export const useChatStore = defineStore('chat', () => {
         messages: [{
           role: 'assistant',
           content: '你好！我是 EduMate 学习助手，请随时向我提问课程相关问题。',
+          references: null,
           timestamp: Date.now()
         }],
         sessionId: null

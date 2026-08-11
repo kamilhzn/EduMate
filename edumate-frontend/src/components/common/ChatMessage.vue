@@ -19,6 +19,31 @@
     <div class="message-bubble">
       <div class="message-content" v-html="renderedContent"></div>
       <span v-if="isStreaming && role === 'assistant'" class="typing-cursor">█</span>
+
+      <!-- 参考资料 -->
+      <div v-if="references?.length" class="message-references">
+        <div class="ref-header">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+          </svg>
+          <span>参考资料</span>
+        </div>
+        <div class="ref-list">
+          <div
+            v-for="ref in references"
+            :key="ref.index"
+            class="ref-item"
+            :title="ref.snippet"
+          >
+            <span class="ref-dot">{{ ref.index }}</span>
+            <div class="ref-info">
+              <div v-if="ref.courseName" class="ref-course">{{ ref.courseName }}</div>
+              <div v-if="ref.chapterPath" class="ref-path">{{ ref.chapterPath }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -30,6 +55,7 @@ import { marked } from 'marked'
 const props = defineProps({
   role: { type: String, required: true },
   content: { type: String, default: '' },
+  references: { type: Array, default: null },
   isStreaming: { type: Boolean, default: false }
 })
 
@@ -108,5 +134,83 @@ const renderedContent = computed(() => {
   color: var(--color-primary);
   animation: typewriterCursor 1s infinite;
   font-weight: 700;
+}
+
+/* ---------- 参考资料 ---------- */
+.message-references {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--color-border, #dcdfe6);
+}
+
+.ref-header {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-secondary, #909399);
+  margin-bottom: 8px;
+}
+
+.ref-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.ref-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  background: white;
+  border: 1px solid var(--color-border, #e4e7ed);
+  border-radius: 16px;
+  cursor: default;
+  transition: all 0.2s;
+  max-width: 100%;
+}
+
+.ref-item:hover {
+  border-color: var(--color-primary, #409eff);
+  box-shadow: 0 2px 6px rgba(64, 158, 255, 0.1);
+}
+
+.ref-dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--color-primary, #409eff);
+  color: white;
+  font-size: 11px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ref-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.ref-course {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text, #303133);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ref-path {
+  font-size: 11px;
+  color: var(--color-text-secondary, #909399);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 </style>

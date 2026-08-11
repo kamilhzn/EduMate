@@ -18,6 +18,7 @@
         :key="i"
         :role="msg.role"
         :content="msg.content"
+        :references="msg.references"
         :isStreaming="isStreaming && i === messages.length - 1 && msg.role === 'assistant'"
       />
     </div>
