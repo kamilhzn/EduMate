@@ -1,7 +1,0 @@
-﻿.\mvnw.cmd : 'DOSKEY' is not recognized as an internal or external command,
-At line:1 char:948
-+ ... s\RAG\EduMate ; .\mvnw.cmd test-compile -pl edumate-core 2>&1 | Out-F ...
-+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    + CategoryInfo          : NotSpecified: ('DOSKEY' is not...ternal command,:String) [], RemoteException
-    + FullyQualifiedErrorId : NativeCommandError
- 
