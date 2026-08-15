@@ -33,3 +33,8 @@ build/
 .vscode/
 
 /docs
+
+### 环境变量（含密钥，禁止提交）###
+.env
+.env.local
+.env.*.local
